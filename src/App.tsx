@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import Auth from './pages/Auth';
+import Admin from './pages/Admin';
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="blog" element={<Blog />} />
           <Route path="blog/:slug" element={<BlogPost />} />
           <Route path="auth" element={<Auth />} />
+          <Route path="admin" element={<Admin />} />
         </Route>
       </Routes>
     </Router>

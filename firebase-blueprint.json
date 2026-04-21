@@ -1,0 +1,43 @@
+{
+  "entities": {
+    "post": {
+      "title": "Blog Post",
+      "description": "A public blog post",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "category": { "type": "string" },
+        "image": { "type": "string" },
+        "date": { "type": "string" },
+        "readTime": { "type": "string" },
+        "author": { "type": "string" },
+        "slug": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "number", "description": "Timestamp created" },
+        "updatedAt": { "type": "number", "description": "Timestamp updated" }
+      },
+      "required": ["title", "slug", "content", "createdAt", "updatedAt"]
+    },
+    "userRole": {
+      "title": "User Role",
+      "description": "Defines access levels per user",
+      "type": "object",
+      "properties": {
+        "isAdmin": { "type": "boolean" },
+        "email": { "type": "string" }
+      },
+      "required": ["isAdmin"]
+    }
+  },
+  "firestore": {
+    "/posts/{postId}": {
+      "schema": { "$ref": "#/entities/post" },
+      "description": "Stores public blog posts"
+    },
+    "/userRoles/{userId}": {
+      "schema": { "$ref": "#/entities/userRole" },
+      "description": "Stores user roles"
+    }
+  }
+}

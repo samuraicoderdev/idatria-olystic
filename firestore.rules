@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { 
+      return isSignedIn() && (
+        request.auth.token.email == "sergiojurado.casado@gmail.com" ||
+        (exists(/databases/$(database)/documents/userRoles/$(request.auth.uid)) 
+        && get(/databases/$(database)/documents/userRoles/$(request.auth.uid)).data.isAdmin == true)
+      ); 
+    }
+
+    // Entity Validators
+    function isValidPost(data) {
+      return data.keys().hasAll(['title', 'slug', 'content', 'createdAt', 'updatedAt'])
+        && data.size() >= 5
+        && data.title is string && data.title.size() <= 200
+        && data.slug is string && data.slug.size() <= 200
+        && data.content is string && data.content.size() <= 500000 // Large limit for markdown content
+        && data.createdAt == request.time
+        && data.updatedAt == request.time
+        && ( !('excerpt' in data) || (data.excerpt is string && data.excerpt.size() <= 500) )
+        && ( !('category' in data) || (data.category is string && data.category.size() <= 100) )
+        && ( !('image' in data) || (data.image is string && data.image.size() <= 1000) )
+        && ( !('date' in data) || (data.date is string && data.date.size() <= 100) )
+        && ( !('readTime' in data) || (data.readTime is string && data.readTime.size() <= 50) )
+        && ( !('author' in data) || (data.author is string && data.author.size() <= 100) );
+    }
+
+    match /userRoles/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      // No creation or update by anyone here, handled exclusively by manual DB intervention or backend triggers.
+      allow list, create, update, delete: if false;
+    }
+
+    match /posts/{postId} {
+      // It is a public blog. Anyone can read.
+      allow read: if true;
+      
+      allow create: if isAdmin() && isValidId(postId) && isValidPost(incoming());
+      
+      allow update: if 
+        isAdmin() 
+        && isValidId(postId) 
+        && isValidPost(incoming())
+        && incoming().createdAt == existing().createdAt // Immortal Field
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'title', 'slug', 'content', 'excerpt', 'category', 'image', 'date', 'readTime', 'author', 'updatedAt'
+        ]);
+
+      allow delete: if isAdmin() && isValidId(postId);
+    }
+  }
+}
