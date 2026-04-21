@@ -1,7 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Paleta de colores de Idatria Olystic en formato HSLA */
+:root {
+  --mauve-bark: hsla(8, 17%, 37%, 1);       /* #6D524E */
+  --dusty-taupe: hsla(15, 28%, 57%, 1);     /* #B18273 */
+  --rosy-taupe: hsla(16, 36%, 68%, 1);      /* #CBA091 */
+  --lavender-blush: hsla(328, 61%, 94%, 1); /* #F9E6F0 */
+  --fuchsia-plum: hsla(323, 50%, 53%, 1);   /* #C34C95 */
+}
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+
+  /* Registramos los colores en Tailwind V4 para crear clases de utilidad */
+  /* Ej: bg-idatria-fuchsia, text-idatria-rosy, border-idatria-mauve */
+  --color-idatria-mauve: var(--mauve-bark);
+  --color-idatria-taupe: var(--dusty-taupe);
+  --color-idatria-rosy: var(--rosy-taupe);
+  --color-idatria-blush: var(--lavender-blush);
+  --color-idatria-fuchsia: var(--fuchsia-plum);
 }
